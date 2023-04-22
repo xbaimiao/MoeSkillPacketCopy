@@ -11,7 +11,7 @@
     </keep-names>
     <ignore-classes>
         <class template="class *shadow*" />
-        <class template="class com.xbaimiao.template.EasyTemplate"/>
+        <class template="class com.xbaimiao.moeskillcopy.EasyTemplate"/>
     </ignore-classes>
 
     <property name="log-file" value="log.xml"/>

@@ -8,7 +8,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.lombok") version "1.8.0"
 }
 
-group = "com.xbaimiao.template"
+group = "com.xbaimiao.moeskillcopy"
 version = "1.0.0"
 
 repositories {
