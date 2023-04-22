@@ -4,6 +4,7 @@ import com.xbaimiao.easylib.module.item.hasLore
 import com.xbaimiao.easylib.module.item.isAir
 import com.xbaimiao.easylib.module.utils.colored
 import com.xbaimiao.easylib.module.utils.submit
+import com.xbaimiao.easylib.task.EasyLibTask
 import com.xbaimiao.moeskillcopy.api.ConfigurationReader
 import com.xbaimiao.moeskillcopy.api.Cooldown
 import com.xbaimiao.moeskillcopy.util.CooldownUtil
@@ -14,6 +15,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.PlayerQuitEvent
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -27,6 +30,14 @@ class TimeKiller(
     private val deadTime: Long,
     private val deadMessage: String
 ) : Cooldown(), Listener {
+
+    private val imprintingMap = HashMap<UUID, ArrayList<EasyLibTask>>()
+
+    // 如果攻击者死亡或者退出游戏 印记消失
+    @EventHandler
+    fun quit(event: PlayerQuitEvent) {
+        imprintingMap.remove(event.player.uniqueId)?.forEach { it.cancel() }
+    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     fun damage(event: EntityDamageByEntityEvent) {
@@ -43,9 +54,11 @@ class TimeKiller(
             if (entity is Player) {
                 CooldownUtil.cooldownMessage(entity, deadTime, deadMessage)
             }
-            submit(delay = deadTime * 20L) {
+            val task = submit(delay = deadTime * 20L) {
                 entity.damage(entity.health, damager)
             }
+            imprintingMap.putIfAbsent(damager.uniqueId, ArrayList())
+            imprintingMap[damager.uniqueId]!!.add(task)
         }
     }
 
